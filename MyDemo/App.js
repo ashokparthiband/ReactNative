@@ -15,6 +15,7 @@ import {
 // import styles from './Styles/styles'
 
 var styles = require('./Styles/styles')
+var demoScroll = require('./GeneralComponents/ex_scrollView')
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
