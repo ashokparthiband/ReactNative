@@ -11,6 +11,10 @@ import {
   Text,
   View
 } from 'react-native';
+
+import Home from './Screens/Home'
+import ScanWindow from './Screens/ScanWindow'
+import { StackNavigator } from 'react-navigation';
 import CustomListView from './App/CustomListView';
 
 const instructions = Platform.select({
@@ -20,30 +24,28 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-type Props = {};
-export default class App extends Component<Props> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <View style={styles.titleView}><Text style={styles.text}>Devices</Text></View>
-        <CustomListView></CustomListView>
-      </View>
-    );
-  }
-}
+const App = StackNavigator({
+  Home: { screen: Home},
+  Scan: { screen: ScanWindow}
+})
+
+// type Props = {};
+// export default class App extends Component<Props> {
+//   render() {
+//     return (
+//       <View style={styles.container}>
+          
+//         </View>
+//     );
+//   }
+// }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#eff0f2',
+    backgroundColor: '#eff042',
     flex: 1,
     flexDirection: 'column',
-  },
-  text:{
-    fontSize: 30,
-    textAlign: 'center'
-  },
-  titleView:{
-    marginTop: 30,
-    backgroundColor:'#eff0f2'
   }
 });
+
+export default App;
