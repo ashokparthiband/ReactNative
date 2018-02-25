@@ -11,6 +11,7 @@ import {
   Text,
   View
 } from 'react-native';
+import CustomListView from './App/CustomListView';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
@@ -24,15 +25,8 @@ export default class App extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit App.js
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
+        <View style={styles.titleView}><Text style={styles.text}>Devices</Text></View>
+        <CustomListView></CustomListView>
       </View>
     );
   }
@@ -40,19 +34,16 @@ export default class App extends Component<Props> {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#eff0f2',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    flexDirection: 'column',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  text:{
+    fontSize: 30,
+    textAlign: 'center'
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  titleView:{
+    marginTop: 30,
+    backgroundColor:'#eff0f2'
+  }
 });
