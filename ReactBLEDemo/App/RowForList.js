@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image ,TouchableHighlight,Alert} from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
@@ -26,19 +26,39 @@ const styles = StyleSheet.create({
     
   });
 
-  const Row = (props) => (
-    <View style={styles.container}>
-      <Image source={(require('./Images/bulbIcon.png'))} style={styles.photo}/>
-      <View style={{flex: 1,flexDirection: 'column'}}>
-        <Text style={styles.text}>
-            {`${props.deviceName}`}
+  
+
+  class Row extends React.Component {
+
+    onPress() {
+      Alert.alert('Packet Info',"Device : "+this.props.data.deviceName+"\n RSSI:"+this.props.data.RSSI+"\n Adv Data:\n"+this.props.data.AdvData);
+    }
+
+    render(){
+      return(
+        <TouchableHighlight onPress={() =>{this.onPress()}} >
+        <View style={styles.container}>
+        <Image source={(require('./Images/bulbIcon.png'))} style={styles.photo}/>
+        <View style={{flex: 1,flexDirection: 'column'}}> 
+        <Text style={styles.text}> Device
+            {this.props.data.deviceName} RSSI {this.props.data.RSSI}
         </Text>
         <Text style={styles.text1}>
-            {`${props.deviceUUID}`}
+            {this.props.data.AdvData}
         </Text>
-      </View>
-    </View>
-  );
+       </View>  
+       </View>       
+        </TouchableHighlight>      
+      )
+    }
+  }
   
   export default Row;
+
+  // <Text style={styles.text}> Device
+  //           {`${props.deviceName}`} RSSI {`${props.RSSI}`}
+  //       </Text>
+  //       <Text style={styles.text1}>
+  //           {`${props.AdvData}`}
+  //       </Text>
    

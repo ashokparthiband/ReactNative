@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, ListView, StyleSheet, Text } from 'react-native';
 import Row from './RowForList';
-import data from './DummyData';
 
 const styles = StyleSheet.create({
     container: {
@@ -16,20 +15,29 @@ const styles = StyleSheet.create({
     },
   });
 
-  class CustomListView extends React.Component {
+  class DeviceListView extends React.Component {
     constructor(props) {
       super(props);
       const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
       this.state = {
-        dataSource: ds.cloneWithRows(data),
+        db:props.deviceList,
+        dataSource: ds.cloneWithRows(props.deviceList),
       };
     }
+
+    componentWillReceiveProps(props)
+    {
+        this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(this.props.deviceList)
+        });
+    }
+   
     render() {
       return (
         <ListView
           style={styles.container}
           dataSource={this.state.dataSource}
-          renderRow={(data) => <Row {...data}/>}
+          renderRow={(data) => <Row data={data}/>}
           renderSeparator = {
             (sectionId,rowId) => <View key={rowId} style={styles.separator }/>
           }
@@ -38,5 +46,4 @@ const styles = StyleSheet.create({
     }
   }
   
-export default CustomListView;
-
+export default DeviceListView;
