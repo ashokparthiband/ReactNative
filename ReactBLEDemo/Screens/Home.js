@@ -4,6 +4,7 @@ import CustomListView from './../App/CustomListView';
 import { StackNavigator } from 'react-navigation';
 import {NativeModules,NativeEventEmitter} from 'react-native';
 import DeviceListView from './../App/DeviceListView'
+import styles from './HomeStyle'
 
 let bridgeReact = NativeModules.BirdgeReact;
 
@@ -30,7 +31,13 @@ class Home extends React.Component<Props> {
       headerTitleStyle:{
         fontSize:24,
         alignSelf:'center'
-      }   
+      },
+      // headerRight:
+      // <Button
+      //   onPress={() => navigation.navigate("Scan", {screen: "ScanWindow"})}
+      //   title = "Next"
+      //   color= "#000" >
+      // </Button>   
     });
 
     // On Click Start Scan
@@ -109,75 +116,9 @@ class Home extends React.Component<Props> {
     }
   }
 
-
-  const styles = StyleSheet.create({
-    container: {
-      backgroundColor: '#eff0f2',
-      flex: 1,
-      flexDirection: 'column',
-      // justifyContent: 'center',
-    },
-    container1: {
-      backgroundColor: '#eff0f2',
-      flexDirection: 'row',
-      height:60,
-      alignItems: 'center',
-      justifyContent:'space-around'
-    },
-    containerListView: {
-      flex: 1,
-      backgroundColor:'white'
-    },
-    text:{
-      fontSize: 30,
-      textAlign: 'center'
-    },
-    titleView:{
-      marginTop: 30,
-      backgroundColor:'#eff0f2'
-    },
-    button: {
-      marginBottom: 0,
-      fontSize:20,
-      alignItems: 'center',
-      height:40
-    },
-    buttonText: {
-      padding: 20,
-      color: 'white'
-    },
-    actionButton: {
-      padding:10,
-      alignItems: 'center',
-    }
-  });
-
   export default Home;
 
 
-  // headerRight:
-  //     <Button
-  //       onPress={() => navigation.navigate("Scan", {screen: "ScanWindow"})}
-  //       title = "Scan"
-  //       color= "#000" >
-  //     </Button>
+  
 
-  {/* <Button
-        onPress={() => {
-            bridgeReact.addEvent("Hai","Location")
-          }}
-        title = "Scan"
-        color= "#000"
-         /> */}
-
-
-        //  onPress={() => {
-        //   bridgeReact.scanForDevices((error, events) => {
-        //   if (error) {
-        //     console.error(error);
-        //   } 
-        //   else {
-        //     console.log("\n============ \n Device Name :"+events.deviceName);
-        //   }
-        //   });
-        // }}
+  
