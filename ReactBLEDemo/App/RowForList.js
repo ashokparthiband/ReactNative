@@ -7,7 +7,8 @@ const styles = StyleSheet.create({
       padding: 12,
       flexDirection: 'row',
       alignItems: 'center',
-      height:60
+      justifyContent:'space-between',
+      height:110
     },
     text: {
       marginLeft: 12,
@@ -15,8 +16,11 @@ const styles = StyleSheet.create({
     },
     text1: {
         marginLeft: 12,
-        fontSize: 12,
-        top: 5,
+        fontSize: 13,
+      },
+    text2: {
+        marginLeft: 12,
+        fontSize: 11,
       },
     photo: {
       height: 40,
@@ -31,7 +35,7 @@ const styles = StyleSheet.create({
   class Row extends React.Component {
 
     onPress() {
-      Alert.alert('Packet Info',"Device : "+this.props.data.deviceName+"\n RSSI:"+this.props.data.RSSI+"\n Adv Data:\n"+this.props.data.AdvData);
+      Alert.alert('Packet Info',"Device : ".toUpperCase()+this.props.data.deviceName+"\n RSSI:"+this.props.data.RSSI+"\n Adv Data:\n".toUpperCase()+this.props.data.AdvData);
     }
 
     render(){
@@ -39,12 +43,18 @@ const styles = StyleSheet.create({
         <TouchableHighlight onPress={() =>{this.onPress()}} >
         <View style={styles.container}>
         <Image source={(require('./Images/bulbIcon.png'))} style={styles.photo}/>
-        <View style={{flex: 1,flexDirection: 'column'}}> 
-        <Text style={styles.text}> Device
-            {this.props.data.deviceName} RSSI {this.props.data.RSSI}
+        <View style={{flex: 1,flexDirection: 'column',justifyContent:'space-between'}}> 
+        <Text style={styles.text}> 
+          {'Device :'}{this.props.data.deviceName}
+        </Text>
+        <Text style={styles.text}> 
+            RSSI : {this.props.data.RSSI}
         </Text>
         <Text style={styles.text1}>
-            {this.props.data.AdvData}
+            Adv Data : {this.props.data.AdvData}
+        </Text>
+        <Text style={styles.text2}>
+            Received At : {this.props.data.receivedAt}
         </Text>
        </View>  
        </View>       

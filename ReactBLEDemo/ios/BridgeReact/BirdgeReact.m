@@ -37,54 +37,41 @@
 
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(addEvent:(NSString *)name location:(NSString *)location)
-{
-//  __weak typeof (self) weakSelf = self;
-  
-  
-}
-
-- (NSDictionary *)constantsToExport {
-  return @{@"SayHai":@"Hi EveryOne"};
-}
-
-
-
-//RCT_EXPORT_METHOD(scanForDevices:(RCTResponseSenderBlock)callback)
-//{
-//  _scanHandler = callback;
-//  toggle = !toggle;
-//  if (toggle) {
-//    [self startDeviceScan];
-//  }else {
-//    [scanObj stopScan];
-//  }
-//}
-
 RCT_EXPORT_METHOD(scanForDevices)
 {
-//  toggle = !toggle;
-//  if (toggle) {
-//
-//  }else {
-//    [scanObj stopScan];
-//  }
+
   [self startDeviceScan];
 }
 
+RCT_EXPORT_METHOD(stopScan){
+  [scanObj stopScan];
+}
+
 - (void) startDeviceScan {
+  __weak typeof(self) weakSelf = self;
   [scanObj startScanWithHandler:^(ScannedResult *scannedResult) {
     
     NSData * advertisementData = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataManufacturerDataKey];
-    NSString * adverString = [self hexadecimalStringFromNSData:advertisementData];
+    NSString * adverString = [weakSelf hexadecimalStringFromNSData:advertisementData];
+    NSNumber * isConnectable = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataIsConnectable];
     
     NSDictionary * dictResult = @{@"deviceName":scannedResult.deviceName,
                                   @"RSSI":@(scannedResult.RSSI),
                                   @"AdvData":adverString,
-                                  @"isConnectableMode":@(0),
+                                  @"isConnectableMode":isConnectable,
+                                  @"receivedAt":[weakSelf currentDateInString],
                                   };
-    [emitter fireResult:dictResult];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [emitter fireResult:dictResult];
+    });
+    
   }];
+}
+
+- (NSString *) currentDateInString {
+  NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+  [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS"];
+  return [dateFormatter stringFromDate:[NSDate date]];
 }
 
 - (NSString *)hexadecimalStringFromNSData : (NSData*) data {
@@ -104,8 +91,6 @@ RCT_EXPORT_METHOD(scanForDevices)
   return [NSString stringWithString:hexString];
 }
 
-RCT_EXPORT_METHOD(stopScan){
-  [scanObj stopScan];
-}
+
 
 @end

@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
           renderSeparator = {
             (sectionId,rowId) => <View key={rowId} style={styles.separator }/>
           }
+          enableEmptySections = {true}  
         />
       );
     }

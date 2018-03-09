@@ -1260,6 +1260,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wisilica.-";
 				PRODUCT_NAME = ReactBLEDemo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1278,6 +1279,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wisilica.-";
 				PRODUCT_NAME = ReactBLEDemo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

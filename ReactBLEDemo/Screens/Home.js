@@ -20,7 +20,7 @@ class Home extends React.Component<Props> {
       super();
       this.state = {
           textValue:'Change me',
-          scannedResultArray : [],
+          scannedResultArray : [{}],
           scannedResult1:[],
           isToggled: false,
       }
@@ -73,7 +73,7 @@ class Home extends React.Component<Props> {
         console.log('STOP SCAN');
         bridgeReact.stopScan();
         this.setState({isToggled:false})
-        subscription.remove();
+        if(subscription)subscription.remove();
     }
 
     // // On clicking stop/scan
