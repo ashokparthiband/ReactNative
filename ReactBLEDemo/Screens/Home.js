@@ -5,6 +5,7 @@ import { StackNavigator } from 'react-navigation';
 import {NativeModules,NativeEventEmitter} from 'react-native';
 import DeviceListView from './../App/DeviceListView'
 import styles from './HomeStyle'
+import NumberCounter from './../App/NumberCounter'
 
 let bridgeReact = NativeModules.BirdgeReact;
 
@@ -110,15 +111,11 @@ class Home extends React.Component<Props> {
               color= "#000" >
             </Button>
          </View>
-          <DeviceListView deviceList={this.state.scannedResultArray}></DeviceListView>
+          <DeviceListView deviceList={this.state.scannedResultArray}></DeviceListView> 
         </View>
       );
     }
   }
 
   export default Home;
-
-
-  
-
   
