@@ -28,14 +28,14 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-const counter = () => (
-    <Provider store = {store}>
-      <CounterAction/>
-    </Provider>
-);
+// const counter = () => (
+//     <Provider store = {store}>
+//       <CounterAction/>
+//     </Provider>
+// );
 
 const App = StackNavigator({
-  Counter: {screen:counter},
+  Counter: {screen:CounterAction},
   Home: { screen: Home},
   Scan: { screen: ScanWindow}
 })
