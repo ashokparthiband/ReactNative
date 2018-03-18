@@ -15,7 +15,7 @@
 
 @interface BirdgeReact ()
 {
-  Scanner * scanObj;
+  __strong Scanner * scanObj;
   BOOL toggle;
   __block BridgeReactEmitter * emitter;
 }
@@ -61,6 +61,7 @@ RCT_EXPORT_METHOD(stopScan){
                                   @"isConnectableMode":isConnectable,
                                   @"receivedAt":[weakSelf currentDateInString],
                                   };
+    NSLog(@"\n=================== \n Scann Result : \n %@ \n ===================",dictResult);
     dispatch_async(dispatch_get_main_queue(), ^{
       [emitter fireResult:dictResult];
     });

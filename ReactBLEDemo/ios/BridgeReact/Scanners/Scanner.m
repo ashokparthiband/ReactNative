@@ -36,10 +36,10 @@ typedef enum{
 }
 
 - (void) startScan {
-  if (!self.objCentralManager) {
-    [self initCentralManager];
-  }
-  [self.objCentralManager scanForPeripheralsWithServices:nil options:@{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES }];
+//  if (!self.objCentralManager) {
+//    [self initCentralManager];
+//  }
+//  [self.objCentralManager scanForPeripheralsWithServices:nil options:@{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES }];
 }
 
 - (void) startScanWithHandler : (OnScanningHandler) handler
@@ -48,11 +48,23 @@ typedef enum{
   if (!self.objCentralManager) {
     [self initCentralManager];
   }
-  [self.objCentralManager scanForPeripheralsWithServices:nil options:@{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES }];
+  [self wakeUpScanner];
 }
 
 - (void) stopScan {
   [self.objCentralManager stopScan];
+  _handler = nil;
+}
+
+- (void) wakeUpScanner {
+  [self.objCentralManager stopScan];
+  [self.objCentralManager scanForPeripheralsWithServices:nil options:@{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES }];
+  [self performSelector:@selector(haltScanner) withObject:nil afterDelay:10];
+}
+
+- (void) haltScanner {
+  [self.objCentralManager stopScan];
+  [self performSelector:@selector(wakeUpScanner) withObject:nil afterDelay:.5];
 }
 
 #pragma mark --- CBCentralManagerDelegate ---

@@ -44,43 +44,51 @@ class Home extends React.Component<Props> {
     // On Click Start Scan
     startScan() {
       console.log('START SCAN');
-        this.setState({isToggled:true})
-        subscription = scanningEmitter.addListener(
-          'ScannedResult',
-          (scanResultObj) => { // On Callback update data source
-            if(this.state.scannedResultArray.length >= 1000) // Add only 1000 records
-            {
-              this.setState({
-                scannedResult1 : [...this.state.scannedResult1,this.state.scannedResultArray] // Add the result to array
-              })
-              subscription.remove(); // Remove listener
-            }else {
-              this.setState({
-                scannedResultArray : [...this.state.scannedResultArray,scanResultObj]
-              })
-              if(!this.state.isDataSourceSet){
-                this.setState({
-                  isDataSourceSet:true
-                })
-              }
-            }
+        // this.setState({isToggled:true})
+        this.props.startScan();
+        // this.props.addScanResult({deviceName:"Device"});
+      this.createSubcriptionForUpdates()
+    }
+
+    createSubcriptionForUpdates() {
+      subscription = scanningEmitter.addListener(
+        'ScannedResult',
+        (scanResultObj) => { // On Callback update data source
+          if(this.props.scannedResultArray.length >= 1000) // Add only 1000 records
+          {
+            // this.setState({
+            //   scannedResult1 : [...this.state.scannedResult1,this.state.scannedResultArray] // Add the result to array
+            // })
+            subscription.remove(); // Remove listener
+          }else {
+            this.props.addScanResult(scanResultObj);
+            // this.setState({
+            //   scannedResultArray : [...this.state.scannedResultArray,scanResultObj]
+            // })
+            // if(!this.state.isDataSourceSet){
+            //   this.setState({
+            //     isDataSourceSet:true
+            //   })
+            // }
           }
-          );
-          bridgeReact.scanForDevices(); // Call native scan 
+        }
+        );
+        bridgeReact.scanForDevices(); // Call native scan 
     }
 
     // On clicking stop scan
     stopScan(){
         console.log('STOP SCAN');
         bridgeReact.stopScan();
-        this.setState({isToggled:false})
+        // this.setState({isToggled:false})
+        this.props.stopScan();
         if(subscription)subscription.remove();
     }
 
     // // On clicking stop/scan
     onClick() {
       
-      if(!this.state.isToggled){
+      if(!this.props.isToggled){
         this.startScan();
       }else {
         this.stopScan();
@@ -89,9 +97,8 @@ class Home extends React.Component<Props> {
 
     // Clear the data source 
     onClearPressed(){
-      this.setState({
-        scannedResultArray:[]
-      });
+      this.props.removeScanResult();
+      console.log("Clear Tapped");
     }
 
 
@@ -102,7 +109,8 @@ class Home extends React.Component<Props> {
           <View style={styles.container1}>
             <Button  style={styles.button}
               onPress={() => {this.onClick()}}
-              title = {this.state.isToggled?'Stop':'Scan'}
+              // title = {this.state.isToggled?'Stop':'Scan'}
+              title = {this.props.buttonTitle}
               color= "#000" >
             </Button>
             <Button style={styles.button}
@@ -111,7 +119,7 @@ class Home extends React.Component<Props> {
               color= "#000" >
             </Button>
          </View>
-          <DeviceListView deviceList={this.state.scannedResultArray}></DeviceListView> 
+          <DeviceListView deviceList={this.props.scannedResultArray}></DeviceListView> 
         </View>
       );
     }
