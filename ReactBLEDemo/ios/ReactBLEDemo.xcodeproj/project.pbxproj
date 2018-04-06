@@ -38,6 +38,7 @@
 		F911A2F5204AA11200D05CF0 /* BridgeReactEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = F911A2F4204AA11200D05CF0 /* BridgeReactEmitter.m */; };
 		F95CB56E2042D929007B8B5A /* BirdgeReact.m in Sources */ = {isa = PBXBuildFile; fileRef = F95CB56D2042D929007B8B5A /* BirdgeReact.m */; };
 		F95CB5942042DA59007B8B5A /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
+		F974FA68206D4B91009D4266 /* BLEConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = F974FA67206D4B91009D4266 /* BLEConstants.m */; };
 		F9A1AE1D20485A6100B92F8C /* Scanner.m in Sources */ = {isa = PBXBuildFile; fileRef = F9A1AE1C20485A6100B92F8C /* Scanner.m */; };
 		F9A1AE262048600A00B92F8C /* ScannedResult.m in Sources */ = {isa = PBXBuildFile; fileRef = F9A1AE252048600A00B92F8C /* ScannedResult.m */; };
 /* End PBXBuildFile section */
@@ -349,6 +350,8 @@
 		F911A2F4204AA11200D05CF0 /* BridgeReactEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BridgeReactEmitter.m; path = BridgeReact/BridgeReactEmitter.m; sourceTree = "<group>"; };
 		F95CB56C2042D929007B8B5A /* BirdgeReact.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BirdgeReact.h; path = BridgeReact/BirdgeReact.h; sourceTree = "<group>"; };
 		F95CB56D2042D929007B8B5A /* BirdgeReact.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BirdgeReact.m; path = BridgeReact/BirdgeReact.m; sourceTree = "<group>"; };
+		F974FA66206D4B91009D4266 /* BLEConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLEConstants.h; sourceTree = "<group>"; };
+		F974FA67206D4B91009D4266 /* BLEConstants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEConstants.m; sourceTree = "<group>"; };
 		F9A1AE1B20485A6100B92F8C /* Scanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Scanner.h; sourceTree = "<group>"; };
 		F9A1AE1C20485A6100B92F8C /* Scanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Scanner.m; sourceTree = "<group>"; };
 		F9A1AE242048600A00B92F8C /* ScannedResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScannedResult.h; sourceTree = "<group>"; };
@@ -503,6 +506,7 @@
 				F95CB56D2042D929007B8B5A /* BirdgeReact.m */,
 				F911A2F3204AA11200D05CF0 /* BridgeReactEmitter.h */,
 				F911A2F4204AA11200D05CF0 /* BridgeReactEmitter.m */,
+				F974FA65206D4B6B009D4266 /* BLEConstants */,
 				F9A1ADF520485A4500B92F8C /* Scanners */,
 			);
 			name = ReactBLEDemo;
@@ -617,6 +621,16 @@
 				2D16E6721FA4F8DC00B85C8A /* libRCTBlob-tvOS.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F974FA65206D4B6B009D4266 /* BLEConstants */ = {
+			isa = PBXGroup;
+			children = (
+				F974FA66206D4B91009D4266 /* BLEConstants.h */,
+				F974FA67206D4B91009D4266 /* BLEConstants.m */,
+			);
+			name = BLEConstants;
+			path = BridgeReact/BLEConstants;
 			sourceTree = "<group>";
 		};
 		F9A1ADF520485A4500B92F8C /* Scanners */ = {
@@ -1155,6 +1169,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F974FA68206D4B91009D4266 /* BLEConstants.m in Sources */,
 				F95CB56E2042D929007B8B5A /* BirdgeReact.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				F9A1AE262048600A00B92F8C /* ScannedResult.m in Sources */,

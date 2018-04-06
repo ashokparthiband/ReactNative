@@ -18,6 +18,7 @@
   __strong Scanner * scanObj;
   BOOL toggle;
   __block BridgeReactEmitter * emitter;
+  __block NSMutableArray * arrScannedObjects;
 }
 
 @property (nonatomic,copy) RCTResponseSenderBlock scanHandler;
@@ -31,6 +32,7 @@
   if (self = [super init]) {
     scanObj = [[Scanner alloc] init];
     emitter = [BridgeReactEmitter allocWithZone: nil];
+    arrScannedObjects = [[NSMutableArray alloc] init];
   }
   return self;
 }
@@ -39,7 +41,6 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(scanForDevices)
 {
-
   [self startDeviceScan];
 }
 
@@ -49,25 +50,52 @@ RCT_EXPORT_METHOD(stopScan){
 
 - (void) startDeviceScan {
   __weak typeof(self) weakSelf = self;
-  [scanObj startScanWithHandler:^(ScannedResult *scannedResult) {
-    
-    NSData * advertisementData = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataManufacturerDataKey];
-    NSString * adverString = [weakSelf hexadecimalStringFromNSData:advertisementData];
-    NSNumber * isConnectable = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataIsConnectable];
-    
-    NSDictionary * dictResult = @{@"deviceName":scannedResult.deviceName,
-                                  @"RSSI":@(scannedResult.RSSI),
-                                  @"AdvData":adverString,
-                                  @"isConnectableMode":isConnectable,
-                                  @"receivedAt":[weakSelf currentDateInString],
-                                  };
-    NSLog(@"\n=================== \n Scann Result : \n %@ \n ===================",dictResult);
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [emitter fireResult:dictResult];
-    });
-    
+  [scanObj startScanWithHandler:^(ScannedResult *scannedResult,NSError * error)
+  {
+    if(error)
+    {
+      NSDictionary * dictResult = @{@"errorMessage":@"Bluetooth Busy!"};
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if(dictResult)[emitter fireResult:dictResult];
+      });
+    }
+    else if(scannedResult)
+    {
+      NSPredicate * predicate = [NSPredicate predicateWithFormat:@"peripheral.name = %@",scannedResult.peripheral.name];
+      NSArray * result = [arrScannedObjects filteredArrayUsingPredicate:predicate];
+      
+      ScannedResult * resultFromArray = [result firstObject];
+      
+      if (!resultFromArray) {
+        resultFromArray = scannedResult;
+        NSData * advertisementData = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataManufacturerDataKey];
+        NSString * adverString = [weakSelf hexadecimalStringFromNSData:advertisementData];
+        NSNumber * isConnectable = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataIsConnectable];
+        
+        NSDictionary * dictResult = @{@"deviceName":scannedResult.deviceName,
+                                      @"RSSI":@(scannedResult.RSSI),
+                                      @"AdvData":adverString,
+                                      @"isConnectableMode":isConnectable,
+                                      @"receivedAt":[weakSelf currentDateInString],
+                                      };
+        RCTLog(@"\n=================== \n Scann Result : \n %@ \n ===================",dictResult);
+        
+        if(scannedResult)[arrScannedObjects addObject:scannedResult];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          if(dictResult)[emitter fireResult:dictResult];
+        });
+      }
+    }
+    //    if (scannedResult.RSSI > -40 && scannedResult.RSSI < 0) {
+    //
+    //    }
   }];
 }
+
+//- (dispatch_queue_t)methodQueue
+//{
+//  return dispatch_get_main_queue();
+//}
 
 - (NSString *) currentDateInString {
   NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];

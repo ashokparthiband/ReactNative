@@ -8,10 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
+@class CBPeripheral;
+
 @interface ScannedResult : NSObject
 
 @property (nonatomic) NSString * deviceName;
 @property (nonatomic) int RSSI;
 @property (nonatomic) NSDictionary * advertisementData;
+@property (nonatomic) CBPeripheral * peripheral;
 
 @end

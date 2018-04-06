@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ListView, StyleSheet, Text ,TouchableHighlight,Button,titleStyle} from 'react-native';
+import { View, ListView, StyleSheet, Text ,TouchableHighlight,Button,titleStyle,Alert} from 'react-native';
 import CustomListView from './../App/CustomListView';
 import { StackNavigator } from 'react-navigation';
 import {NativeModules,NativeEventEmitter} from 'react-native';
@@ -51,26 +51,24 @@ class Home extends React.Component<Props> {
     }
 
     createSubcriptionForUpdates() {
+      console.log("Triggered --------- createSubcriptionForUpdates");
       subscription = scanningEmitter.addListener(
         'ScannedResult',
         (scanResultObj) => { // On Callback update data source
-          if(this.props.scannedResultArray.length >= 1000) // Add only 1000 records
+          if(scanResultObj.errorMessage) 
           {
-            // this.setState({
-            //   scannedResult1 : [...this.state.scannedResult1,this.state.scannedResultArray] // Add the result to array
-            // })
-            subscription.remove(); // Remove listener
+            Alert.alert(scanResultObj.errorMessage);
+            this.stopScan();
           }else {
-            this.props.addScanResult(scanResultObj);
-            // this.setState({
-            //   scannedResultArray : [...this.state.scannedResultArray,scanResultObj]
-            // })
-            // if(!this.state.isDataSourceSet){
-            //   this.setState({
-            //     isDataSourceSet:true
-            //   })
-            // }
+            if(this.props.scannedResultArray.length >= 1000) // Add only 1000 records
+            {
+              subscription.remove(); // Remove listener
+              console.log("Subscription Removed!");
+            }else {
+              this.props.addScanResult(scanResultObj);
+            }
           }
+          
         }
         );
         bridgeReact.scanForDevices(); // Call native scan 
@@ -87,7 +85,7 @@ class Home extends React.Component<Props> {
 
     // // On clicking stop/scan
     onClick() {
-      
+      console.log("Toggle Value :"+this.props.isToggled)
       if(!this.props.isToggled){
         this.startScan();
       }else {
@@ -109,7 +107,6 @@ class Home extends React.Component<Props> {
           <View style={styles.container1}>
             <Button  style={styles.button}
               onPress={() => {this.onClick()}}
-              // title = {this.state.isToggled?'Stop':'Scan'}
               title = {this.props.buttonTitle}
               color= "#000" >
             </Button>
