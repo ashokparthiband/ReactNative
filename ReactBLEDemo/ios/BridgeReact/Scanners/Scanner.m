@@ -19,13 +19,16 @@ typedef enum{
   
 }WiSeBleOperateMode;
 
-@interface Scanner () <CBCentralManagerDelegate>
+@interface Scanner () <CBCentralManagerDelegate,CBPeripheralDelegate>
 
 @property (strong, nonatomic) CBCentralManager     * objCentralManager;
 @property (nonatomic,strong ) dispatch_queue_t     centralManagerQueue;
 @property (nonatomic,assign ) WiSeBleOperateMode   operateMode;
 @property (nonatomic,copy) OnScanningHandler handler;
 @property (nonatomic,copy) OnConnectComplete connectHandler;
+@property (nonatomic,copy) OnReadServiceComplete readServiceHandler;
+@property (nonatomic,copy) OnDiscoverCharacteristicComplete discoverCharacteristicHandler;
+@property (nonatomic,copy) OnReadCharacteristicValueComplete readCharacteristicValueHandler;
 
 @end
 
@@ -120,8 +123,10 @@ typedef enum{
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
+  RCTLog(@"/n Connected to %@",peripheral);
   if (_connectHandler) {
     _connectHandler(YES,nil);
+    _connectHandler = nil;
   }
 }
 
@@ -134,14 +139,70 @@ typedef enum{
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
+  RCTLog(@"\n Disconnected from %@ Error : %@",peripheral,error);
   if (_connectHandler) {
     if (error) {
       _connectHandler(NO,error);
     }else {
       _connectHandler(YES,nil);
     }
-    
+    _connectHandler = nil;
   }
 }
+
+#pragma mark - Read Services and Charectersitics
+
+- (void) readServicesFromDevice : (ScannedResult *) peripheral services:(NSArray *) services withHandler : (OnReadServiceComplete) handler{
+  _readServiceHandler = handler;
+  [self stopScan];
+  peripheral.peripheral.delegate = self;
+  [peripheral.peripheral discoverServices:services];
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error {
+  RCTLog(@"\n Discovered Services");
+  if (_readServiceHandler) {
+    _readServiceHandler(peripheral,error);
+    _readServiceHandler = nil;
+  }
+}
+
+- (void) discoverCharacteristics : (NSArray *) characteristics forDevice : (ScannedResult *) peripheral forService:(CBService *) service withHandler : (OnDiscoverCharacteristicComplete) handler
+{
+  RCTLog(@"\n Start Discover Chars");
+  _discoverCharacteristicHandler = handler;
+  [self stopScan];
+  [peripheral.peripheral discoverCharacteristics:characteristics forService:service];
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error {
+  RCTLog(@"\n Discovered Chars");
+  if (_discoverCharacteristicHandler) {
+    _discoverCharacteristicHandler(peripheral,service,error);
+//    _discoverCharacteristicHandler = nil;
+  }else {
+    RCTLog(@"\n _discoverCharacteristicHandler is nil");
+  }
+}
+
+
+- (void) readValueForCharacteristics : (CBCharacteristic *) characteristic forDevice : (ScannedResult *) peripheral withHandler : (OnReadCharacteristicValueComplete) handler {
+  RCTLog(@"\n Read Value For Char : %@",characteristic.UUID);
+  [self stopScan];
+  _readCharacteristicValueHandler = handler;
+  [peripheral.peripheral readValueForCharacteristic:characteristic];
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
+  RCTLog(@"\n Value : %@ for Char : %@",characteristic.value,characteristic);
+  if (_readCharacteristicValueHandler) {
+    _readCharacteristicValueHandler(peripheral,characteristic,characteristic.value,error);
+//    _readCharacteristicValueHandler = nil;
+  }else {
+    RCTLog(@"\n _readCharacteristicValueHandler is nil");
+  }
+  
+}
+
 
 @end

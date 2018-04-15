@@ -10,12 +10,12 @@ const ScannerReducer = (state = {
         case Actions.START_SCAN:
             return Object.assign({},state,{
                 isToggled:!state.isToggled,
-                buttonTitle:"Scaning"
+                buttonTitle:"Scan"
             });
         case Actions.STOP_SCAN:
             return Object.assign({},state,{
                 isToggled:!state.isToggled,
-                buttonTitle:"Stoping"
+                buttonTitle:"Stop"
             });
         case Actions.ADD_SCAN_RESULT:
             return Object.assign({},state,{

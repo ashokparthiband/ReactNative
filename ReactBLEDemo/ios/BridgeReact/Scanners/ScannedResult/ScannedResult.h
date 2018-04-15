@@ -16,5 +16,6 @@
 @property (nonatomic) int RSSI;
 @property (nonatomic) NSDictionary * advertisementData;
 @property (nonatomic) CBPeripheral * peripheral;
+@property (nonatomic) NSString * uuid;
 
 @end

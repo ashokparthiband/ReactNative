@@ -14,6 +14,7 @@ import {
 
 import Home from './Screens/Home'
 import ScanWindow from './Screens/ScanWindow'
+import Hardwares from './Screens/Hardwares'
 import { StackNavigator } from 'react-navigation';
 import CustomListView from './App/CustomListView';
 import NumberCounter from './App/NumberCounter';
@@ -21,6 +22,7 @@ import CounterAction from './App/actions/CounterAction';
 import ScannerAction from './App/actions/ScannerAction'
 import {Provider} from 'react-redux'
 import store from './App/reducers/index'
+import HardwareDetails from './App/HardwareDetails'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
@@ -29,35 +31,13 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-// const counter = () => (
-//     <Provider store = {store}>
-//       <CounterAction/>
-//     </Provider>
-// );
-
 const App = StackNavigator({
-  Home: { screen: ScannerAction},
+  Hardwares: { screen: Hardwares},
+  Scanner: { screen: ScannerAction},
   Counter: {screen:CounterAction},
-  Scan: { screen: ScanWindow}
+  Scan: { screen: ScanWindow},
+  HardwareDetails : {screen:HardwareDetails}
 })
-
-// type Props = {};
-// export default class App extends Component<Props> {
-//   render() {
-//     return (
-//       <View style={styles.container}>
-          
-//         </View>
-//     );
-//   }
-// }
-
- // headerRight:
-      // <Button
-      //   onPress={() => navigation.navigate("Scan", {screen: "ScanWindow"})}
-      //   title = "Next"
-      //   color= "#000" >
-      // </Button>   
 
 const styles = StyleSheet.create({
   container: {

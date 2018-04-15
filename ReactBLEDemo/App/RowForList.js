@@ -1,5 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image ,TouchableHighlight,Alert} from 'react-native';
+import {NativeModules,NativeEventEmitter} from 'react-native';
+
+let bridgeReact = NativeModules.BirdgeReact;
 
 const styles = StyleSheet.create({
     container: {
@@ -35,7 +38,15 @@ const styles = StyleSheet.create({
   class Row extends React.Component {
 
     onPress() {
-      Alert.alert('Packet Info',"Device : ".toUpperCase()+this.props.data.deviceName+"\n RSSI:"+this.props.data.RSSI+"\n Adv Data:\n".toUpperCase()+this.props.data.AdvData);
+      // Alert.alert('Packet Info',"Device : ".toUpperCase()+this.props.data.deviceName+"\n RSSI:"+this.props.data.RSSI+"\n Adv Data:\n".toUpperCase()+this.props.data.AdvData);
+      console.log("==================== \n Connect Started : \n=====================")
+      bridgeReact.connectDevice(this.props.data,((error, events) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(events);
+        }
+      }));
     }
 
     render(){

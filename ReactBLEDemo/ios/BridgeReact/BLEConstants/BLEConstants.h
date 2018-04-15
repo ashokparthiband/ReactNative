@@ -9,7 +9,16 @@
 #import <Foundation/Foundation.h>
 
 #define DeviceBasicInfoService @"DDDD"
+#define DeviceBasicCharHardWareVersion @"DD01"
+#define DeviceBasicCharSoftWareVersion @"DD02"
+#define DeviceBasicCharFirmWareVersion @"DD03"
+#define DeviceBasicCharManufacturerName @"DD04"
+
 #define HeartRateInfoService @"ADAD"
+#define HeartRateInfoCharHeartRatePoint @"AD01"
+#define HeartRateInfoCharBodySensorLocation @"AD02"
+#define HeartRateInfoCharBodyHeartRateMeasurement @"AD03"
+
 
 
 

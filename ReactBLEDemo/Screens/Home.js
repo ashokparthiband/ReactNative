@@ -28,7 +28,7 @@ class Home extends React.Component<Props> {
     }
 
     static navigationOptions = ({navigation}) => ({
-      title: "Devices",
+      title: "Scanner",
       headerTitleStyle:{
         fontSize:24,
         alignSelf:'center'
@@ -97,6 +97,7 @@ class Home extends React.Component<Props> {
     onClearPressed(){
       this.props.removeScanResult();
       console.log("Clear Tapped");
+      bridgeReact.clearScanList();
     }
 
 
