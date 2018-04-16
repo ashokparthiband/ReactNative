@@ -1281,7 +1281,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Elbin john (M2FMNXQD4U)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1296,8 +1296,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.wisilica.platform;
 				PRODUCT_NAME = ReactBLEDemo;
-				PROVISIONING_PROFILE = "68bd4482-452f-45e9-ac8c-93eec867ff6a";
-				PROVISIONING_PROFILE_SPECIFIER = PlatformDevelopment;
+				PROVISIONING_PROFILE = "1af902a1-e74a-44dc-9760-1c760a2edd84";
+				PROVISIONING_PROFILE_SPECIFIER = AllAppGeneric;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1307,11 +1307,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Elbin john (M2FMNXQD4U)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = APTY75H4ED;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ReactBLEDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -1321,8 +1321,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.wisilica.platform;
 				PRODUCT_NAME = ReactBLEDemo;
-				PROVISIONING_PROFILE = "1af902a1-e74a-44dc-9760-1c760a2edd84";
-				PROVISIONING_PROFILE_SPECIFIER = AllAppGeneric;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
