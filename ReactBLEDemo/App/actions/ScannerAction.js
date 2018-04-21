@@ -13,7 +13,8 @@ const mapDispatchToProps = (dispatch) => ({
     startScan:()=>dispatch({type:Actions.START_SCAN}),
     stopScan:()=>dispatch({type:Actions.STOP_SCAN}),
     addScanResult : (scanResult) => dispatch({type:Actions.ADD_SCAN_RESULT,scanResult}),
-    removeScanResult: () => dispatch({type:Actions.REMOVE_SCAN_RESULT})
+    removeScanResult: () => dispatch({type:Actions.REMOVE_SCAN_RESULT}),
+    updateScanResult : (scanResult) => dispatch({type:Actions.UPDATE_SCAN_RESULT,scanResult})
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Home);

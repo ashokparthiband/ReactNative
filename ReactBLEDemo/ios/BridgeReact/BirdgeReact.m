@@ -21,6 +21,7 @@
   BOOL toggle;
   __block BridgeReactEmitter * emitter;
   __block NSMutableArray * arrScannedObjects;
+  __block NSMutableArray * arrPairedDevices;
   __block NSMutableArray <CBService *>* services;
   __block NSMutableArray <CBCharacteristic*>* chars;
   __block CBService * currentService;
@@ -36,9 +37,10 @@
 - (instancetype)init
 {
   if (self = [super init]) {
-    scanObj = [[Scanner alloc] init];
-    emitter = [BridgeReactEmitter allocWithZone: nil];
+    scanObj           = [[Scanner alloc] init];
+    emitter           = [BridgeReactEmitter allocWithZone : nil];
     arrScannedObjects = [[NSMutableArray alloc] init];
+    arrPairedDevices  = [[NSMutableArray alloc] init];
   }
   return self;
 }
@@ -70,22 +72,27 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
   [self connectBLEDevice:[self getScanResultForUUID:strUUID]];
 }
 
+
+/**
+ Connet Device
+ */
 - (void) connectBLEDevice : (ScannedResult *) device {
   __weak typeof (self) weakSelf = self;
   [scanObj connectDevice:device withHandler:^(BOOL connectStatus, NSError *error) {
     if (connectStatus) {
-      NSDictionary * dict = @{@"connectOperation":@(YES)};
-      _connectHandler(@[[NSNull null], dict]);
       [weakSelf discoverServiceInDevice:device];
-      
     }else {
       NSDictionary * dict = @{@"errorMessage":error.localizedDescription};
       _connectHandler(@[dict,[NSNull null]]);
+      _connectHandler = nil;
     }
-    _connectHandler = nil;
+    
   }];
 }
 
+/**
+ Find scan result for deviceUUID
+ */
 - (ScannedResult *) getScanResultForUUID : (NSString * ) deviceUUID {
   NSPredicate * predicate = [NSPredicate predicateWithFormat:@"uuid = %@",deviceUUID];
   NSArray * array = [arrScannedObjects filteredArrayUsingPredicate:predicate];
@@ -94,11 +101,14 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
 }
 
 
+/**
+ Start Device Scan
+ */
 - (void) startDeviceScan {
   __weak typeof(self) weakSelf = self;
   [scanObj startScanWithHandler:^(ScannedResult *scannedResult,NSError * error)
   {
-    if(error)
+    if(error) // On Error
     {
       NSDictionary * dictResult = @{@"errorMessage":@"Bluetooth Busy!"};
       dispatch_async(dispatch_get_main_queue(), ^{
@@ -111,49 +121,66 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
       NSArray * result = [arrScannedObjects filteredArrayUsingPredicate:predicate];
       
       ScannedResult * resultFromArray = [result firstObject];
+      NSDictionary * dictResult;
       
       if (!resultFromArray) {
-        resultFromArray = scannedResult;
-        NSData * advertisementData = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataManufacturerDataKey];
-        NSString * adverString = [weakSelf hexadecimalStringFromNSData:advertisementData];
-        NSNumber * isConnectable = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataIsConnectable];
-        NSString * localName = [scannedResult.advertisementData objectForKeyedSubscript:CBAdvertisementDataLocalNameKey];
-        NSString * uuid = [[NSUUID UUID] UUIDString];
-        scannedResult.uuid = uuid;
+        resultFromArray            = scannedResult;
+        NSData * advertisementData = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataManufacturerDataKey];
+        NSString * adverString     = [weakSelf hexadecimalStringFromNSData                    :advertisementData];
+        NSNumber * isConnectable   = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataIsConnectable];
+        NSString * localName       = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataLocalNameKey];
+        NSString * uuid            = [[NSUUID UUID] UUIDString];
+        scannedResult.uuid         = uuid;
         
-        NSDictionary * dictResult = @{@"deviceName":localName?localName:scannedResult.deviceName,
+        dictResult = @{@"deviceName":localName?localName:scannedResult.deviceName,
                                       @"RSSI":@(scannedResult.RSSI),
                                       @"AdvData":adverString,
                                       @"isConnectableMode":isConnectable,
                                       @"receivedAt":[weakSelf currentDateInString],
-                                      @"deviceUUID":scannedResult.uuid
+                                      @"deviceUUID":scannedResult.uuid,
+                                      @"callBackOn":@"scanDeviceFound",
                                       };
         RCTLog(@"\n=================== \n Scann Result : \n %@ \n ===================",dictResult);
-        
         if(scannedResult)[arrScannedObjects addObject:scannedResult];
-        dispatch_async(dispatch_get_main_queue(), ^{
-          if(dictResult)[emitter fireResult:dictResult];
-        });
       }
+      else
+      {
+        resultFromArray.RSSI = scannedResult.RSSI;
+        dictResult = @{
+                       @"RSSI":@(scannedResult.RSSI),
+                       @"deviceUUID":resultFromArray.uuid,
+                       @"callBackOn":@"scanRSSIUpdate",
+                       };
+      }
+      
+      
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if(dictResult)[emitter fireResult:dictResult];
+      });
     }
   }];
 }
 
 
+/**
+ Discover Services
+ */
 - (void) discoverServiceInDevice : (ScannedResult *) device {
   NSArray * arrServices = [BLEUtil getAllServices];
   [scanObj readServicesFromDevice:device services:arrServices withHandler:^(CBPeripheral *scannedResult, NSError *error) {
     if (error) {
-      
+      RCTLog(@"\n Read Service Failed for Service : %@",arrServices);
     }else{
       services = [[device.peripheral valueForKey:@"services"] mutableCopy];
       [self discoverCharacteristicsForService:device];
-      
     }
     RCTLog(@"\n=================== \n Services \n %@ \n ===================",scannedResult.services);
   }];
 }
 
+/**
+ Discover Characteristics For Services
+ */
 - (void) discoverCharacteristicsForService : (ScannedResult *) device
 {
   if (services.count) {
@@ -182,7 +209,6 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
 
 - (void) readCharacteristicValueFromDevice : (ScannedResult *) device {
   
-  CBService * tempService = nil;
   if (services.count) {
     currentService = services.firstObject;
     chars = [[BLEUtil getCharacteristicforService:services.firstObject inDevice:device] mutableCopy];
@@ -192,6 +218,21 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
       [services removeObject:currentService];
       [self readCharacteristicValueFromDevice:device];
     }
+  }else { // Read Char Completed
+    NSDictionary * dict = @{@"connectOperation":@(YES)};
+    _connectHandler(@[[NSNull null], dict]);
+    _connectHandler = nil;
+    [arrPairedDevices addObject:device];
+    NSDictionary * dictResult = @{
+                                  @"hardwareVersion":device.hardwareVersion,
+                                  @"softwareVersion":device.softwareVersion,
+                                  @"firmwareVersion":device.firmwareVersion,
+                                  @"manufatureName":device.manufatureName,
+                                  @"sensorLocation":device.sensorLocation,
+                                  @"heartRate":device.hearRateMesurement,
+                                  @"callBackOn":@"readCharsComplete",
+                                  };
+    if(dictResult)[emitter fireResult:dictResult];
   }
 }
 
@@ -210,12 +251,12 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
       RCTLog(@"Read Char Failed : %@",error);
     }else {
       RCTLog(@"Read Char Success : %@",value);
+      [BLEUtil updateDevice:device forCharacteristic:characteristic];
     }
     [chars removeObject:chars1];
     [self continueReadingCharsForDevice:device];
   }];
 }
-
 
 - (NSString *) currentDateInString {
   NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -239,6 +280,8 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
   
   return [NSString stringWithString:hexString];
 }
+
+
 
 
 

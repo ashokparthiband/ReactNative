@@ -15,6 +15,10 @@ const scanningEmitter = new NativeEventEmitter(BridgeReactEmitter);
 
 const subscription = undefined;
 
+const scanDeviceCallback     = "scanDeviceFound";
+const scanRSSIUpdateCallback = "scanRSSIUpdate" ;
+const readCharCompleteCallback = "readCharsComplete" ;
+
 class Home extends React.Component<Props> {
 
     constructor(){
@@ -33,12 +37,6 @@ class Home extends React.Component<Props> {
         fontSize:24,
         alignSelf:'center'
       },
-      // headerRight:
-      // <Button
-      //   onPress={() => navigation.navigate("Scan", {screen: "ScanWindow"})}
-      //   title = "Next"
-      //   color= "#000" >
-      // </Button>   
     });
 
     // On Click Start Scan
@@ -57,9 +55,22 @@ class Home extends React.Component<Props> {
         (scanResultObj) => { // On Callback update data source
           if(scanResultObj.errorMessage) 
           {
-            Alert.alert(scanResultObj.errorMessage);
             this.stopScan();
+            Alert.alert(scanResultObj.errorMessage);
+            
           }else {
+            this.performOpearationBasedOnCallbackType(scanResultObj);
+          }
+        }
+        );
+        bridgeReact.scanForDevices(); // Call native scan 
+    }
+
+    performOpearationBasedOnCallbackType (scanResultObj) {
+      let callbackType = scanResultObj.callBackOn;
+      console.log('\n Callback :',callbackType);
+      if(scanDeviceCallback == callbackType) 
+      {
             if(this.props.scannedResultArray.length >= 1000) // Add only 1000 records
             {
               subscription.remove(); // Remove listener
@@ -67,11 +78,16 @@ class Home extends React.Component<Props> {
             }else {
               this.props.addScanResult(scanResultObj);
             }
-          }
-          
-        }
-        );
-        bridgeReact.scanForDevices(); // Call native scan 
+            
+      }
+      else if (scanRSSIUpdateCallback == callbackType) 
+      {
+          this.props.updateScanResult(scanResultObj);
+      }
+      else if (readCharCompleteCallback == callbackType) 
+      {
+
+      }
     }
 
     // On clicking stop scan

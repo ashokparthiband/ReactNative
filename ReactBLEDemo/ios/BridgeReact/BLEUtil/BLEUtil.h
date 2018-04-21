@@ -17,5 +17,6 @@
 + (NSArray *) getAllServices;
 + (NSArray *) getAllCharacteristicsForService:(CBService *) service;
 + (NSArray <CBCharacteristic *>*) getCharacteristicforService:(CBService *) service inDevice : (ScannedResult *) device;
++ (void) updateDevice : (ScannedResult *) device forCharacteristic : (CBCharacteristic *) characteristic;
 
 @end

@@ -10,11 +10,13 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "BLEConstants.h"
 #import "ScannedResult.h"
+#import <React/RCTLog.h>
 
 @implementation BLEUtil
 
 + (NSArray *) getAllServices {
-  NSArray * arrServices = @[[CBUUID UUIDWithString:HeartRateInfoService]]; //[CBUUID UUIDWithString:DeviceBasicInfoService],
+  NSArray * arrServices = @[[CBUUID UUIDWithString:DeviceBasicInfoService],
+                            [CBUUID UUIDWithString:HeartRateInfoService]];
   return arrServices;
 }
 
@@ -48,6 +50,53 @@
   CBService * service1 = result.firstObject;
   chars = service1.characteristics;
   return chars;
+}
+
++ (void) updateDevice : (ScannedResult *) device forCharacteristic : (CBCharacteristic *) characteristic
+{
+  NSString * strUUID = [characteristic.UUID UUIDString];
+  if ([strUUID isEqualToString:DeviceBasicCharHardWareVersion])
+  {
+    device.hardwareVersion = [self getVersionStringForData:characteristic.value];
+  }
+  if ([strUUID isEqualToString:DeviceBasicCharSoftWareVersion])
+  {
+    device.hardwareVersion = [self getVersionStringForData:characteristic.value];
+  }
+  if ([strUUID isEqualToString:DeviceBasicCharFirmWareVersion])
+  {
+    device.hardwareVersion = [self getVersionStringForData:characteristic.value];
+  }
+  if ([strUUID isEqualToString:DeviceBasicCharManufacturerName])
+  {
+    device.manufatureName = [self getNameStringForData:characteristic.value];
+  }
+  if ([strUUID isEqualToString:HeartRateInfoCharBodySensorLocation])
+  {
+    device.sensorLocation = [self getNameStringForData:characteristic.value];
+  }
+  if ([strUUID isEqualToString:HeartRateInfoCharBodyHeartRateMeasurement])
+  {
+    device.hearRateMesurement = [self getNameStringForData:characteristic.value];
+  }
+}
+
++ (NSString *) getVersionStringForData : (NSData *) data{
+  NSString * version ;
+  if (data && data.length == 3) {
+    const uint8_t * array = [data bytes];
+    version = [NSString stringWithFormat:@"%X.%X.%X",array[0],array[1],array[2]];
+  }
+  RCTLog(@"\n Value : %@",version);
+  return version;
+}
+
++ (NSString *) getNameStringForData : (NSData *) data
+{
+  NSString * name;
+  if (data) name = [[NSString alloc] initWithData:data encoding:1];
+  RCTLog(@"\n Value : %@",name);
+  return name;
 }
 
 @end
