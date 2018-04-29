@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { View, Text, StyleSheet, Image ,TouchableHighlight,Alert} from 'react-native';
 import {NativeModules,NativeEventEmitter} from 'react-native';
 
@@ -38,6 +39,7 @@ const styles = StyleSheet.create({
   class Row extends React.Component {
 
     onPress() {
+      this.props.stopScan1();
       // Alert.alert('Packet Info',"Device : ".toUpperCase()+this.props.data.deviceName+"\n RSSI:"+this.props.data.RSSI+"\n Adv Data:\n".toUpperCase()+this.props.data.AdvData);
       console.log("==================== \n Connect Started : \n=====================")
       bridgeReact.connectDevice(this.props.data,((error, events) => {
@@ -55,24 +57,29 @@ const styles = StyleSheet.create({
         <View style={styles.container}>
         <Image source={(require('./Images/bulbIcon.png'))} style={styles.photo}/>
         <View style={{flex: 1,flexDirection: 'column',justifyContent:'space-between'}}> 
-        <Text style={styles.text}> 
-          {'Device :'}{this.props.data.deviceName}
-        </Text>
-        <Text style={styles.text}> 
+          <Text style={styles.text}> 
+            {'Device :'}{this.props.data.deviceName} {'  UUID :'} {this.props.data.deviceUUID}
+          </Text>
+          <Text style={styles.text}> 
             RSSI : {this.props.data.RSSI}
-        </Text>
-        <Text style={styles.text1}>
+          </Text>
+          <Text style={styles.text1}>
             Adv Data : {this.props.data.AdvData}
-        </Text>
-        <Text style={styles.text2}>
+          </Text>
+          <Text style={styles.text2}>
             Received At : {this.props.data.receivedAt}
-        </Text>
-       </View>  
-       </View>       
+          </Text>
+        </View>  
+        </View>       
         </TouchableHighlight>      
       )
     }
   }
+
+  Row.propTypes = {
+    stopScan1:PropTypes.func,
+  };
+  
   
   export default Row;
 

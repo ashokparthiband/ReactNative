@@ -36,18 +36,36 @@
 
 - (instancetype)init
 {
-  if (self = [super init]) {
+  static BirdgeReact * singletonManager = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    singletonManager = [super init];
     scanObj           = [[Scanner alloc] init];
     emitter           = [BridgeReactEmitter allocWithZone : nil];
     arrScannedObjects = [[NSMutableArray alloc] init];
     arrPairedDevices  = [[NSMutableArray alloc] init];
-  }
-  return self;
+  });
+  return singletonManager;
 }
+
+//- (instancetype)init
+//{
+//  if (self = [super init]) {
+//    scanObj           = [[Scanner alloc] init];
+//    emitter           = [BridgeReactEmitter allocWithZone : nil];
+//    arrScannedObjects = [[NSMutableArray alloc] init];
+//    arrPairedDevices  = [[NSMutableArray alloc] init];
+//  }
+//  return self;
+//}
 
 //RCT_EXPORT_METHOD(addEvent:(NSString *)name location:(NSString *)location date:(NSDate *)date)
 //{
 //  // Date is ready to use!
+//}
+
+//- (dispatch_queue_t)methodQueue {
+//  return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 //}
 
 RCT_EXPORT_MODULE();
@@ -86,7 +104,6 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
       _connectHandler(@[dict,[NSNull null]]);
       _connectHandler = nil;
     }
-    
   }];
 }
 
@@ -152,8 +169,7 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
                        @"callBackOn":@"scanRSSIUpdate",
                        };
       }
-      
-      
+
       dispatch_async(dispatch_get_main_queue(), ^{
         if(dictResult)[emitter fireResult:dictResult];
       });
@@ -224,13 +240,14 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
     _connectHandler = nil;
     [arrPairedDevices addObject:device];
     NSDictionary * dictResult = @{
-                                  @"hardwareVersion":device.hardwareVersion,
-                                  @"softwareVersion":device.softwareVersion,
-                                  @"firmwareVersion":device.firmwareVersion,
-                                  @"manufatureName":device.manufatureName,
-                                  @"sensorLocation":device.sensorLocation,
-                                  @"heartRate":device.hearRateMesurement,
+                                  @"hardwareVersion":device.hardwareVersion?device.hardwareVersion:@"",
+                                  @"softwareVersion":device.softwareVersion?device.softwareVersion:@"",
+                                  @"firmwareVersion":device.firmwareVersion?device.firmwareVersion:@"",
+                                  @"manufatureName":device.manufatureName?device.manufatureName:@"",
+                                  @"sensorLocation":device.sensorLocation?device.sensorLocation:@"",
+                                  @"heartRate":device.hearRateMesurement?device.hearRateMesurement:@"",
                                   @"callBackOn":@"readCharsComplete",
+                                  @"deviceUUID":device.uuid,
                                   };
     if(dictResult)[emitter fireResult:dictResult];
   }

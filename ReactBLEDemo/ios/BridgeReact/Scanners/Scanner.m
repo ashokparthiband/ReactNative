@@ -19,7 +19,9 @@ typedef enum{
   
 }WiSeBleOperateMode;
 
-@interface Scanner () <CBCentralManagerDelegate,CBPeripheralDelegate>
+@interface Scanner () <CBCentralManagerDelegate,CBPeripheralDelegate> {
+  NSTimer * timer;
+}
 
 @property (strong, nonatomic) CBCentralManager     * objCentralManager;
 @property (nonatomic,strong ) dispatch_queue_t     centralManagerQueue;
@@ -35,7 +37,7 @@ typedef enum{
 @implementation Scanner
 
 - (void) initCentralManager {
-  self.centralManagerQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+  self.centralManagerQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
   self.objCentralManager = [[CBCentralManager alloc] initWithDelegate:self queue:self.centralManagerQueue];
   [self centralManagerDidUpdateState:self.objCentralManager];
 }
@@ -44,10 +46,11 @@ typedef enum{
 {
   _handler = handler;
   if (!self.objCentralManager) {
-    _operateMode = WiSeBleStopSanningMode;
+    _operateMode = WiSeBleSanningPauseMode;
     [self initCentralManager];
   }
   if (_objCentralManager.state == CBCentralManagerStatePoweredOn) {
+    _operateMode = WiSeBleSanningMode;
     [self wakeUpScanner];
   }else {
     NSError * error = [[NSError alloc] init];
@@ -57,21 +60,29 @@ typedef enum{
 }
 
 - (void) stopScan {
+  _operateMode = WiSeBleStopSanningMode;
   [self.objCentralManager stopScan];
   _handler = nil;
+  timer = nil;
 }
 
 - (void) wakeUpScanner {
-  [self.objCentralManager stopScan];
-  _operateMode = WiSeBleSanningMode;
-  [self.objCentralManager scanForPeripheralsWithServices:nil options:@{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES }];
-  [self performSelector:@selector(haltScanner) withObject:nil afterDelay:10];
+  if (WiSeBleSanningMode == _operateMode) {
+    [self.objCentralManager stopScan];
+    [self.objCentralManager scanForPeripheralsWithServices:nil options:@{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self performSelector:@selector(haltScanner) withObject:nil afterDelay:5];
+    });
+  }
 }
 
 - (void) haltScanner {
-  [self.objCentralManager stopScan];
-  _operateMode = WiSeBleStopSanningMode;
-  [self performSelector:@selector(wakeUpScanner) withObject:nil afterDelay:.5];
+  if (WiSeBleSanningMode == _operateMode) {
+    [self.objCentralManager stopScan];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self performSelector:@selector(wakeUpScanner) withObject:nil afterDelay:.5];
+    });
+  }
 }
 
 #pragma mark --- CBCentralManagerDelegate ---

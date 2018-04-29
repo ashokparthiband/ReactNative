@@ -15,8 +15,8 @@ const scanningEmitter = new NativeEventEmitter(BridgeReactEmitter);
 
 const subscription = undefined;
 
-const scanDeviceCallback     = "scanDeviceFound";
-const scanRSSIUpdateCallback = "scanRSSIUpdate" ;
+const scanDeviceCallback       = "scanDeviceFound"   ;
+const scanRSSIUpdateCallback   = "scanRSSIUpdate"    ;
 const readCharCompleteCallback = "readCharsComplete" ;
 
 class Home extends React.Component<Props> {
@@ -66,6 +66,7 @@ class Home extends React.Component<Props> {
         bridgeReact.scanForDevices(); // Call native scan 
     }
 
+    // Perform Operation Based on Callback Type
     performOpearationBasedOnCallbackType (scanResultObj) {
       let callbackType = scanResultObj.callBackOn;
       console.log('\n Callback :',callbackType);
@@ -73,12 +74,11 @@ class Home extends React.Component<Props> {
       {
             if(this.props.scannedResultArray.length >= 1000) // Add only 1000 records
             {
-              subscription.remove(); // Remove listener
+              this.removeSubscription() // Remove listener
               console.log("Subscription Removed!");
             }else {
               this.props.addScanResult(scanResultObj);
             }
-            
       }
       else if (scanRSSIUpdateCallback == callbackType) 
       {
@@ -86,7 +86,31 @@ class Home extends React.Component<Props> {
       }
       else if (readCharCompleteCallback == callbackType) 
       {
+        console.log('Device : '+scanResultObj)
+        this.removeSubscription()
+        const device = this.props.scannedResultArray.map(item => {
+          if (item.deviceUUID === scanResultObj.deviceUUID){
+            return item
+          }
+        })
+        this.props.addDevice(
+          {...device,
+          hardwareVersion:scanResultObj.hardwareVersion,
+          softwareVersion:scanResultObj.softwareVersion,
+          firmwareVersion:scanResultObj.firmwareVersion,
+          sensorLocation:scanResultObj.sensorLocation,
+          heartRate:scanResultObj.heartRate,
+          callBackOn:scanResultObj.callBackOn,
+          deviceUUID:scanResultObj.deviceUUID
+        });
+      }
+      console.log('Device List : '+this.props.deviceList)
+    }
 
+    removeSubscription () {
+      if(subscription) {
+        subscription.remove();
+        subscription = null;
       }
     }
 
@@ -96,7 +120,7 @@ class Home extends React.Component<Props> {
         bridgeReact.stopScan();
         // this.setState({isToggled:false})
         this.props.stopScan();
-        if(subscription)subscription.remove();
+        this.removeSubscription()
     }
 
     // // On clicking stop/scan
@@ -116,6 +140,25 @@ class Home extends React.Component<Props> {
       bridgeReact.clearScanList();
     }
 
+    stopScanning() {
+      bridgeReact.stopScan();
+      this.props.stopScan();
+      this.removeSubscription();
+      subscription = scanningEmitter.addListener(
+        'ScannedResult',
+        (scanResultObj) => { // On Callback update data source
+          if(scanResultObj.errorMessage) 
+          {
+            this.stopScan();
+            Alert.alert(scanResultObj.errorMessage);
+            
+          }else {
+            this.performOpearationBasedOnCallbackType(scanResultObj);
+          }
+        }
+        );
+    }
+
 
     render() {
       const { navigate } = this.props.navigation;
@@ -133,7 +176,7 @@ class Home extends React.Component<Props> {
               color= "#000" >
             </Button>
          </View>
-          <DeviceListView deviceList={this.props.scannedResultArray}></DeviceListView> 
+          <DeviceListView deviceList={this.props.scannedResultArray} stopScan={()=>this.stopScanning()} ></DeviceListView> 
         </View>
       );
     }

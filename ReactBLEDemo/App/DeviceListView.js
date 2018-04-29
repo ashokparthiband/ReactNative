@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { View, ListView, StyleSheet, Text } from 'react-native';
 import Row from './RowForList';
 
@@ -24,12 +25,16 @@ const styles = StyleSheet.create({
         dataSource: ds.cloneWithRows(props.deviceList),
       };
     }
-
+    
     componentWillReceiveProps(props)
     {
         this.setState({
                 dataSource: this.state.dataSource.cloneWithRows(this.props.deviceList)
         });
+    }
+
+    onRowPressed () {
+      this.props.stopScan();
     }
    
     render() {
@@ -37,7 +42,7 @@ const styles = StyleSheet.create({
         <ListView
           style={styles.container}
           dataSource={this.state.dataSource}
-          renderRow={(data) => <Row data={data}/>}
+          renderRow={(data) => <Row data={data} stopScan1 = {()=>{this.onRowPressed()}} />}
           renderSeparator = {
             (sectionId,rowId) => <View key={rowId} style={styles.separator }/>
           }
@@ -46,5 +51,9 @@ const styles = StyleSheet.create({
       );
     }
   }
+
+  DeviceListView.propTypes = {
+    stopScan:PropTypes.func,
+  };
   
 export default DeviceListView;

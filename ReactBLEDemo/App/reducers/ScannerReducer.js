@@ -2,6 +2,7 @@ import * as Actions from './../actions/ActionTypes';
 
 const ScannerReducer = (state = {
     scannedResultArray:[],
+    deviceArray:[],
     isToggled:false,
     buttonTitle:"Scan"
 },action) => {
@@ -36,20 +37,34 @@ const ScannerReducer = (state = {
             return Object.assign({},state,{
                 scannedResultArray:[]
             });
+        case Actions.ADD_DEVICE:
+            return Object.assign({},state,{
+                deviceArray:[...state.deviceArray,action.scanResult]
+            });
+        case Actions.DELETE_DEVICE:
+            const updatedDeviceList = {...state.scannedResultArray}
+            const deleteObjIndex = state.deviceArray.indexOf(item=>{
+                return item.deviceUUID === action.scanResult.deviceUUID
+            })
+            updatedDeviceList.splice(deleteObjIndex,1)
+            return Object.assign({},state,{
+                deviceArray:updatedDeviceList
+            });    
         default:
             return state;
         }
 };
 
-function searchDevice (device,array) {
-    for (var i=0; i < array.length; i++) {
-        if (array[i].deviceUUID == device.deviceUUID) {
-            let scanResult = array[i];
-            scanResult.RSSI = device.RSSI
-            console.log(scanResult)
-            break
-        }
-    }
-}
-
 export default ScannerReducer;
+
+// function searchDevice (device,array) {
+//     for (var i=0; i < array.length; i++) {
+//         if (array[i].deviceUUID == device.deviceUUID) {
+//             let scanResult = array[i];
+//             scanResult.RSSI = device.RSSI
+//             console.log(scanResult)
+//             break
+//         }
+//     }
+// }
+
