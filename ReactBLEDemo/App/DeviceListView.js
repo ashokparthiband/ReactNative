@@ -33,8 +33,8 @@ const styles = StyleSheet.create({
         });
     }
 
-    onRowPressed () {
-      this.props.stopScan();
+    onRowPressed (data) {
+      this.props.stopScan(data);
     }
    
     render() {
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
         <ListView
           style={styles.container}
           dataSource={this.state.dataSource}
-          renderRow={(data) => <Row data={data} stopScan1 = {()=>{this.onRowPressed()}} />}
+          renderRow={(data) => <Row data={data} stopScan1 = {(data)=>{this.onRowPressed(data)}} />}
           renderSeparator = {
             (sectionId,rowId) => <View key={rowId} style={styles.separator }/>
           }

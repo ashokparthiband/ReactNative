@@ -141,6 +141,14 @@ typedef enum{
   }
 }
 
+- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
+  RCTLog(@"/n Failed Connected to %@",peripheral);
+  if (_connectHandler) {
+    _connectHandler(NO,nil);
+    _connectHandler = nil;
+  }
+}
+
 #pragma mark - Dis Connect Device
 
 - (void) disconnectDevice : (ScannedResult *) peripheral withHandler: (OnConnectComplete) handler {

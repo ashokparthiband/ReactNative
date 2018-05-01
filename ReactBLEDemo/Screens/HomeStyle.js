@@ -6,7 +6,6 @@ const styles = StyleSheet.create({
       backgroundColor: '#eff0f2',
       flex: 1,
       flexDirection: 'column',
-      // justifyContent: 'center',
     },
     container1: {
       backgroundColor: '#eff0f2',
@@ -40,6 +39,22 @@ const styles = StyleSheet.create({
     actionButton: {
       padding:10,
       alignItems: 'center',
+    },
+    activityIndicator : {
+      // justifyContent: 'center',
+      // flex:1,
+      // margin: 10,
+      // alignItems: 'center',
+      // height:80,
+      // backgroundColor:'orange',
+      // marginTop: 50,
+      position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
     }
   });
 

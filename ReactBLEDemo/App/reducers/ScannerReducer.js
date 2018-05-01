@@ -1,4 +1,5 @@
 import * as Actions from './../actions/ActionTypes';
+import { stat } from 'fs/promises';
 
 const ScannerReducer = (state = {
     scannedResultArray:[],
@@ -37,12 +38,21 @@ const ScannerReducer = (state = {
             return Object.assign({},state,{
                 scannedResultArray:[]
             });
+        case Actions.DELETE_SCAN_RESULT:
+            const freshScanResult = {...state.scannedResultArray}
+            const deleteObjIndex1 = state.scannedResultArray.indexOf(item => {
+                return item.deviceUUID === action.scanResult.deviceUUID
+            })
+            freshScanResult.splice(deleteObjIndex1,1)
+            return Object.assign({},state,{
+                scannedResultArray:freshScanResult
+            })
         case Actions.ADD_DEVICE:
             return Object.assign({},state,{
                 deviceArray:[...state.deviceArray,action.scanResult]
             });
         case Actions.DELETE_DEVICE:
-            const updatedDeviceList = {...state.scannedResultArray}
+            const updatedDeviceList = {...state.deviceArray}
             const deleteObjIndex = state.deviceArray.indexOf(item=>{
                 return item.deviceUUID === action.scanResult.deviceUUID
             })

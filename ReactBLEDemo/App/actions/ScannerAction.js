@@ -16,6 +16,7 @@ const mapDispatchToProps = (dispatch) => ({
     addScanResult : (scanResult) => dispatch({type:Actions.ADD_SCAN_RESULT,scanResult}),
     removeScanResult: () => dispatch({type:Actions.REMOVE_SCAN_RESULT}),
     updateScanResult : (scanResult) => dispatch({type:Actions.UPDATE_SCAN_RESULT,scanResult}),
+    deleteScanResult : (scanResult) => dispatch({type:Actions.DELETE_SCAN_RESULT,scanResult}),
     addDevice:(scanResult) => dispatch({type:Actions.ADD_DEVICE,scanResult})
 })
 

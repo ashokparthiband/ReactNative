@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ListView, StyleSheet, Text ,TouchableHighlight,Button,titleStyle,Alert} from 'react-native';
+import { View, ListView, StyleSheet, Text ,TouchableHighlight,Button,titleStyle,Alert,ActivityIndicator} from 'react-native';
 import CustomListView from './../App/CustomListView';
 import { StackNavigator } from 'react-navigation';
 import {NativeModules,NativeEventEmitter} from 'react-native';
@@ -27,7 +27,8 @@ class Home extends React.Component<Props> {
           textValue:'Change me',
           scannedResultArray : [{}],
           scannedResult1:[],
-          isToggled: false,
+          isToggled: true,
+          isConnecting:false,
       }
     }
 
@@ -93,6 +94,7 @@ class Home extends React.Component<Props> {
             return item
           }
         })
+        console.log('')
         this.props.addDevice(
           {...device,
           hardwareVersion:scanResultObj.hardwareVersion,
@@ -103,6 +105,7 @@ class Home extends React.Component<Props> {
           callBackOn:scanResultObj.callBackOn,
           deviceUUID:scanResultObj.deviceUUID
         });
+        this.props.deleteScanResult(scanResultObj);
       }
       console.log('Device List : '+this.props.deviceList)
     }
@@ -140,25 +143,42 @@ class Home extends React.Component<Props> {
       bridgeReact.clearScanList();
     }
 
-    stopScanning() {
+    stopScanning(data) {
+      console.log("Data :"+data.deviceUUID);
+      this.showIndicator();
       bridgeReact.stopScan();
       this.props.stopScan();
       this.removeSubscription();
-      subscription = scanningEmitter.addListener(
-        'ScannedResult',
-        (scanResultObj) => { // On Callback update data source
-          if(scanResultObj.errorMessage) 
-          {
-            this.stopScan();
-            Alert.alert(scanResultObj.errorMessage);
-            
-          }else {
-            this.performOpearationBasedOnCallbackType(scanResultObj);
+
+        bridgeReact.connectDevice(data,((error, events) => {
+          if (error) {
+            Alert.alert("Connection Failed");
+          } else {
+            subscription = scanningEmitter.addListener(
+              'ScannedResult',
+              (scanResultObj) => { // On Callback update data source
+                this.stopIndicator();
+                if(scanResultObj.errorMessage) 
+                {
+                  this.stopScan();
+                  Alert.alert(scanResultObj.errorMessage);
+                  
+                }else {
+                  this.performOpearationBasedOnCallbackType(scanResultObj);
+                }
+              }
+            );
           }
-        }
-        );
+        }));
     }
 
+    stopIndicator() {
+      this.setState({isConnecting:false})
+    }
+
+    showIndicator() {
+      this.setState({isConnecting:true})
+    }
 
     render() {
       const { navigate } = this.props.navigation;
@@ -176,7 +196,11 @@ class Home extends React.Component<Props> {
               color= "#000" >
             </Button>
          </View>
-          <DeviceListView deviceList={this.props.scannedResultArray} stopScan={()=>this.stopScanning()} ></DeviceListView> 
+         
+         <DeviceListView deviceList={this.props.scannedResultArray} stopScan={(data)=>this.stopScanning(data)} > </DeviceListView>
+         {this.state.isConnecting?<View style={styles.activityIndicator}>
+            <ActivityIndicator size='large' />
+         </View>:null} 
         </View>
       );
     }

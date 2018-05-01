@@ -98,6 +98,9 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
   __weak typeof (self) weakSelf = self;
   [scanObj connectDevice:device withHandler:^(BOOL connectStatus, NSError *error) {
     if (connectStatus) {
+      NSDictionary * dict = @{@"connectOperation":@(YES)};
+      _connectHandler(@[[NSNull null], dict]);
+      _connectHandler = nil;
       [weakSelf discoverServiceInDevice:device];
     }else {
       NSDictionary * dict = @{@"errorMessage":error.localizedDescription};
@@ -141,23 +144,8 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
       NSDictionary * dictResult;
       
       if (!resultFromArray) {
-        resultFromArray            = scannedResult;
-        NSData * advertisementData = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataManufacturerDataKey];
-        NSString * adverString     = [weakSelf hexadecimalStringFromNSData                    :advertisementData];
-        NSNumber * isConnectable   = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataIsConnectable];
-        NSString * localName       = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataLocalNameKey];
-        NSString * uuid            = [[NSUUID UUID] UUIDString];
-        scannedResult.uuid         = uuid;
-        
-        dictResult = @{@"deviceName":localName?localName:scannedResult.deviceName,
-                                      @"RSSI":@(scannedResult.RSSI),
-                                      @"AdvData":adverString,
-                                      @"isConnectableMode":isConnectable,
-                                      @"receivedAt":[weakSelf currentDateInString],
-                                      @"deviceUUID":scannedResult.uuid,
-                                      @"callBackOn":@"scanDeviceFound",
-                                      };
-        RCTLog(@"\n=================== \n Scann Result : \n %@ \n ===================",dictResult);
+        resultFromArray = scannedResult;
+        dictResult      = [weakSelf scanResultDict :scannedResult];
         if(scannedResult)[arrScannedObjects addObject:scannedResult];
       }
       else
@@ -175,6 +163,27 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
       });
     }
   }];
+}
+
+- (NSDictionary *) scanResultDict : (ScannedResult *) scannedResult {
+  NSDictionary * dictResult;
+  NSData * advertisementData = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataManufacturerDataKey];
+  NSString * adverString     = [self hexadecimalStringFromNSData:advertisementData];
+  NSNumber * isConnectable   = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataIsConnectable];
+  NSString * localName       = [scannedResult.advertisementData objectForKeyedSubscript :CBAdvertisementDataLocalNameKey];
+  NSString * uuid            = [[NSUUID UUID] UUIDString];
+  scannedResult.uuid         = uuid;
+  
+  dictResult = @{@"deviceName":localName?localName:(scannedResult.deviceName?scannedResult.deviceName:@""),
+                 @"RSSI":@(scannedResult.RSSI),
+                 @"AdvData":adverString,
+                 @"isConnectableMode":isConnectable,
+                 @"receivedAt":[self currentDateInString],
+                 @"deviceUUID":scannedResult.uuid,
+                 @"callBackOn":@"scanDeviceFound",
+                 };
+  RCTLog(@"\n=================== \n Scann Result : \n %@ \n ===================",dictResult);
+  return dictResult;
 }
 
 
@@ -235,10 +244,8 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
       [self readCharacteristicValueFromDevice:device];
     }
   }else { // Read Char Completed
-    NSDictionary * dict = @{@"connectOperation":@(YES)};
-    _connectHandler(@[[NSNull null], dict]);
-    _connectHandler = nil;
-    [arrPairedDevices addObject:device];
+    
+    [self addPairedDevice:device];
     NSDictionary * dictResult = @{
                                   @"hardwareVersion":device.hardwareVersion?device.hardwareVersion:@"",
                                   @"softwareVersion":device.softwareVersion?device.softwareVersion:@"",
@@ -251,6 +258,11 @@ RCT_EXPORT_METHOD(connectDevice:(NSDictionary *) device onComplete:(RCTResponseS
                                   };
     if(dictResult)[emitter fireResult:dictResult];
   }
+}
+
+- (void) addPairedDevice : (ScannedResult *) scanResult {
+  [arrScannedObjects removeObject:scanResult];
+  [arrPairedDevices addObject:scanResult];
 }
 
 - (void) continueReadingCharsForDevice : (ScannedResult *) device {
