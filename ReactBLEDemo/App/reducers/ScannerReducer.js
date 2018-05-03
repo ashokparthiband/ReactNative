@@ -1,5 +1,5 @@
 import * as Actions from './../actions/ActionTypes';
-import { stat } from 'fs/promises';
+// import { stat } from 'fs/promises';
 
 const ScannerReducer = (state = {
     scannedResultArray:[],
